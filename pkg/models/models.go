@@ -1,7 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -16,16 +18,35 @@ var (
 )
 
 type Tree struct {
-	ID      int
-	Uuid    string
-	Title   string
-	Owner   int
-	Content string
-	Created time.Time
+	ID int `json:"id"`
+	//Owner   int
+	Title   string    `json:"title"`
+	Uuid    string    `json:"uuid"`
+	Content string    `json:"content"`
+	Created time.Time `json:"created"`
 }
 
-// Define a new User type. Notice how the field names and types align
-// with the columns in the database `users` table?
+func (tree *Tree) ToJSON() ([]byte, error) {
+
+	m := map[string]interface{}{}
+	m["id"] = tree.ID
+	m["title"] = tree.Title
+	m["uuid"] = tree.Uuid
+	fmt.Println(m)
+	m["content"] = &map[string]interface{}{}
+	err := json.Unmarshal([]byte(tree.Content), m["content"])
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(m)
+	byteRepresentation, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	return byteRepresentation, nil
+
+}
+
 type User struct {
 	ID             int
 	Name           string

@@ -2,14 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	_ "errors"
+	"errors"
 	"fmt"
-	_ "fmt"
 	"net/http"
-	_ "strconv"
+	"strconv"
 
 	_ "github.com/Sileadim/skilltree_backend/pkg/forms" // New import
-	_ "github.com/Sileadim/skilltree_backend/pkg/models"
+	"github.com/Sileadim/skilltree_backend/pkg/models"
 )
 
 func (app *application) showListTrees(w http.ResponseWriter, r *http.Request) {
@@ -18,17 +17,35 @@ func (app *application) showListTrees(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) showTree(w http.ResponseWriter, r *http.Request) {
+func (app *application) getTree(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(r.Body)
-	return
+	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
+	if err != nil || id < 1 {
+		app.notFound(w)
+		return
+	}
+	t, err := app.trees.Get(id)
+	fmt.Println(t)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			print("db error")
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	byteRepresentation, err := t.ToJSON()
+	print("byteRepresentation")
+	fmt.Println(byteRepresentation)
+	if err != nil {
+		app.serverError(w, err)
+	}
 
-}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(byteRepresentation)
 
-type Tree struct {
-	Title string `json:"title"`
-	Uuid  string `json:"uuid"`
-	//Content Map[string]string `json:"content"`
 }
 
 func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
@@ -50,18 +67,14 @@ func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println(t["title"].(string))
-	fmt.Println(t["uuid"].(string))
-	fmt.Println(string(content))
-	fmt.Println("******")
+
 	id, err := app.trees.Insert(t["title"].(string), t["uuid"].(string), string(content))
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 	fmt.Println(id)
-	// Do something with the Person struct...
-	fmt.Fprintf(w, "Created tree with id: %v", t)
+	fmt.Fprintf(w, "Created tree with id: %v", id)
 
 }
 

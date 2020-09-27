@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"errors"
+	_ "fmt"
 
 	// Import the models package that we just created. You need to prefix this with
 	// whatever module path you set up back in chapter 02.02 (Project Setup and Enabling
@@ -48,8 +49,8 @@ func (m *TreeModel) Insert(title, uuid, content string) (int, error) {
 func (m *TreeModel) Get(id int) (*models.Tree, error) {
 	// Write the SQL statement we want to execute. Again, I've split it over two
 	// lines for readability.
-	stmt := `SELECT id, uuid, title, content, created FROM snippets
-    WHEREid = ?`
+	stmt := `SELECT id, uuid, title, content, created FROM trees
+    WHERE id = ?`
 
 	// Use the QueryRow() method on the connection pool to execute our
 	// SQL statement, passing in the untrusted id variable as the value for the
@@ -57,7 +58,7 @@ func (m *TreeModel) Get(id int) (*models.Tree, error) {
 	// holds the result from the database.
 	row := m.DB.QueryRow(stmt, id)
 
-	// Initialize a pointer to a new zeroed Snippet struct.
+	// Initialize a pointer to a new zeroed Tree struct.
 	s := &models.Tree{}
 
 	// Use row.Scan() to copy the values from each field in sql.Row to the
@@ -65,6 +66,7 @@ func (m *TreeModel) Get(id int) (*models.Tree, error) {
 	// to row.Scan are *pointers* to the place you want to copy the data into,
 	// and the number of arguments must be exactly the same as the number of
 	// columns returned by your statement.
+
 	err := row.Scan(&s.ID, &s.Uuid, &s.Title, &s.Content, &s.Created)
 	if err != nil {
 		// If the query returns no rows, then row.Scan() will return a
