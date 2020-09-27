@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	mux.Post("/tree/create", http.HandlerFunc(app.createTree))
 	//mux.Post("/tree/create", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.createTree))
 	mux.Get("/tree/:id", http.HandlerFunc(app.getTree))
+	mux.Get("/trees", http.HandlerFunc(app.getTrees))
 
 	//mux.Get("/user/signup", dynamicMiddleware.ThenFunc(app.signupUserForm))
 	//mux.Post("/user/signup", dynamicMiddleware.ThenFunc(app.signupUser))

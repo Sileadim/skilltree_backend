@@ -11,9 +11,18 @@ import (
 	"github.com/Sileadim/skilltree_backend/pkg/models"
 )
 
-func (app *application) showListTrees(w http.ResponseWriter, r *http.Request) {
+func (app *application) getTrees(w http.ResponseWriter, r *http.Request) {
 
-	return
+	trees, err := app.trees.List()
+	
+	m := map[string]interface{}
+
+	[]
+	for t, i := range(trees){
+
+		
+
+	}
 
 }
 

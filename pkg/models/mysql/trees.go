@@ -16,7 +16,7 @@ import (
 type TreeModel struct {
 	DB *sql.DB
 }
-
+// Insert tree
 func (m *TreeModel) Insert(title, uuid, content string) (int, error) {
 	// Write the SQL statement we want to execute. I've split it over two lines
 	// for readability (which is why it's surrounded with backquotes instead
@@ -45,7 +45,7 @@ func (m *TreeModel) Insert(title, uuid, content string) (int, error) {
 	// before returning.
 	return int(id), nil
 }
-
+// Get ids
 func (m *TreeModel) Get(id int) (*models.Tree, error) {
 	// Write the SQL statement we want to execute. Again, I've split it over two
 	// lines for readability.
@@ -86,57 +86,27 @@ func (m *TreeModel) Get(id int) (*models.Tree, error) {
 
 // This will return the 10 most recently created snippets.
 func (m *TreeModel) List() ([]*models.Tree, error) {
-	// Write the SQL statement we want to execute.
-	stmt := `SELECT id, uuid, title, content, created, FROM snippets
-    ORDER BY created DESC LIMIT 10`
-
-	// Use the Query() method on the connection pool to execute our
-	// SQL statement. This returns a sql.Rows resultset containing the result of
-	// our query.
+	// todo: make this
+	stmt := `SELECT id, uuid, title, content, created, FROM trees
+    ORDER BY created DESC LIMIT 100`
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err
 	}
-
-	// We defer rows.Close() to ensure the sql.Rows resultset is
-	// always properly closed before the Latest() method returns. This defer
-	// statement should come *after* you check for an error from the Query()
-	// method. Otherwise, if Query() returns an error, you'll get a panic
-	// trying to close a nil resultset.
 	defer rows.Close()
-
-	// Initialize an empty slice to hold the models.Snippets objects.
-	snippets := []*models.Tree{}
-
-	// Use rows.Next to iterate through the rows in the resultset. This
-	// prepares the first (and then each subsequent) row to be acted on by the
-	// rows.Scan() method. If iteration over all the rows completes then the
-	// resultset automatically closes itself and frees-up the underlying
-	// database connection.
+	trees := []*models.Tree{}
 	for rows.Next() {
 		// Create a pointer to a new zeroed Snippet struct.
-		s := &models.Tree{}
-		// Use rows.Scan() to copy the values from each field in the row to the
-		// new Snippet object that we created. Again, the arguments to row.Scan()
-		// must be pointers to the place you want to copy the data into, and the
-		// number of arguments must be exactly the same as the number of
-		// columns returned by your statement.
-		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created)
+		t := &models.Tree{}
+		err = rows.Scan(&t.ID, &t.Title, &t.Uuid,  &t.Content, &t.Created)
 		if err != nil {
 			return nil, err
 		}
 		// Append it to the slice of snippets.
-		snippets = append(snippets, s)
+		trees = append(trees, t)
 	}
-
-	// When the rows.Next() loop has finished we call rows.Err() to retrieve any
-	// error that was encountered during the iteration. It's important to
-	// call this - don't assume that a successful iteration was completed
-	// over the whole resultset.
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-
-	// If everything went OK then return the Snippets slice.
-	return snippets, nil
+	return trees, nil
 }

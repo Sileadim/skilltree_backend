@@ -28,13 +28,7 @@ type Tree struct {
 
 func (tree *Tree) ToJSON() ([]byte, error) {
 
-	m := map[string]interface{}{}
-	m["id"] = tree.ID
-	m["title"] = tree.Title
-	m["uuid"] = tree.Uuid
-	fmt.Println(m)
-	m["content"] = &map[string]interface{}{}
-	err := json.Unmarshal([]byte(tree.Content), m["content"])
+	m, err := tree.ToMap()
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +39,21 @@ func (tree *Tree) ToJSON() ([]byte, error) {
 	}
 	return byteRepresentation, nil
 
+}
+
+func (tree *Tree) ToMap() (map[string]interface{}, error) {
+
+	m := map[string]interface{}{}
+	m["id"] = tree.ID
+	m["title"] = tree.Title
+	m["uuid"] = tree.Uuid
+	fmt.Println(m)
+	m["content"] = &map[string]interface{}{}
+	err := json.Unmarshal([]byte(tree.Content), m["content"])
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 type User struct {
