@@ -83,7 +83,7 @@ func (m *TreeModel) Get(id int) (*models.Tree, error) {
 }
 
 // This will return the 10 most recently created snippets.
-func (m *TreeModel) Latest() ([]*models.Tree, error) {
+func (m *TreeModel) List() ([]*models.Tree, error) {
 	// Write the SQL statement we want to execute.
 	stmt := `SELECT id, uuid, title, content, created, FROM snippets
     ORDER BY created DESC LIMIT 10`

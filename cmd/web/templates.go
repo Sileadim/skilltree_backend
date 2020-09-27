@@ -5,8 +5,8 @@ import (
 	"path/filepath" // New import
 	"time"
 
-	"github.com/Sileadim/snippetbox/pkg/forms" // New import
-	"github.com/Sileadim/snippetbox/pkg/models"
+	"github.com/Sileadim/skilltree_backend/pkg/forms" // New import
+	"github.com/Sileadim/skilltree_backend/pkg/models"
 )
 
 // Define a templateData type to act as the holding structure for
@@ -21,8 +21,8 @@ type templateData struct {
 	Flash           string
 	Form            *forms.Form
 	IsAuthenticated bool
-	Snippet         *models.Snippet
-	Snippets        []*models.Snippet
+	Tree            *models.Tree
+	Trees           []*models.Tree
 }
 
 func humanDate(t time.Time) string {
