@@ -13,16 +13,15 @@ import (
 
 func (app *application) getTrees(w http.ResponseWriter, r *http.Request) {
 
-	trees, err := app.trees.List()
-	
-	m := map[string]interface{}
+	//trees, err := app.trees.List()
 
-	[]
-	for t, i := range(trees){
-
-		
-
-	}
+	m := map[string]interface{}{}
+	fmt.Println(m)
+	//for t, i := range(trees){
+	//
+	//
+	//
+	//}
 
 }
 
@@ -38,7 +37,6 @@ func (app *application) getTree(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(t)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
-			print("db error")
 			app.notFound(w)
 		} else {
 			app.serverError(w, err)
