@@ -21,14 +21,14 @@ func (m *TreeModel) Insert(title, uuid, content string) (int, error) {
 	// for readability (which is why it's surrounded with backquotes instead
 	// of normal double quotes).
 	stmt := `INSERT INTO trees (title, uuid, content, created)
-    VALUES(?, ?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP()))`
+    VALUES(?, ?, ?, UTC_TIMESTAMP())`
 
 	// Use the Exec() method on the embedded connection pool to execute the
 	// statement. The first parameter is the SQL statement, followed by the
 	// title, content and expiry values for the placeholder parameters. This
 	// method returns a sql.Result object, which contains some basic
 	// information about what happened when the statement was executed.
-	result, err := m.DB.Exec(stmt, uuid, title, content)
+	result, err := m.DB.Exec(stmt, title, uuid, content)
 	if err != nil {
 		return 0, err
 	}

@@ -1,36 +1,69 @@
 package main
 
 import (
+	"encoding/json"
 	_ "errors"
+	"fmt"
 	_ "fmt"
 	"net/http"
 	_ "strconv"
-    _ "github.com/Sileadim/skilltree_backend/pkg/models"
-    _ "github.com/Sileadim/skilltree_backend/pkg/forms" // New import
+
+	_ "github.com/Sileadim/skilltree_backend/pkg/forms" // New import
+	_ "github.com/Sileadim/skilltree_backend/pkg/models"
 )
 
 func (app *application) showListTrees(w http.ResponseWriter, r *http.Request) {
 
-    return
-
+	return
 
 }
-
 
 func (app *application) showTree(w http.ResponseWriter, r *http.Request) {
 
-
-    return
+	fmt.Println(r.Body)
+	return
 
 }
 
+type Tree struct {
+	Title string `json:"title"`
+	Uuid  string `json:"uuid"`
+	//Content Map[string]string `json:"content"`
+}
 
 func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
- 
 
-    return
+	t := map[string]interface{}{}
+	fmt.Println(r)
+	// Try to decode the request body into the struct. If there is an error,
+	// respond to the client with the error message and a 400 status code.
+	err := json.NewDecoder(r.Body).Decode(&t)
+
+	fmt.Println(t)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	content, err := json.Marshal(t["content"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	fmt.Println(t["title"].(string))
+	fmt.Println(t["uuid"].(string))
+	fmt.Println(string(content))
+	fmt.Println("******")
+	id, err := app.trees.Insert(t["title"].(string), t["uuid"].(string), string(content))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	fmt.Println(id)
+	// Do something with the Person struct...
+	fmt.Fprintf(w, "Created tree with id: %v", t)
+
 }
-
 
 //func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 //    err := r.ParseForm()
@@ -112,5 +145,5 @@ func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
 //    http.Redirect(w, r, "/", http.StatusSeeOther)
 //}
 func ping(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("OK"))
+	w.Write([]byte("OK"))
 }
