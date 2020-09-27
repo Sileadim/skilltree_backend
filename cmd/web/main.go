@@ -68,7 +68,7 @@ func main() {
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		session:       session,
-		trees:      &mysql.SnippetModel{DB: db},
+		trees:      &mysql.TreeModel{DB: db},
 		templateCache: templateCache,
 		users:         &mysql.UserModel{DB: db},
 	}

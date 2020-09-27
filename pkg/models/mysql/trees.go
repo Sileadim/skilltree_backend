@@ -16,7 +16,7 @@ type TreeModel struct {
 	DB *sql.DB
 }
 
-func (m *TreeModel) Insert(title, content, expires string) (int, error) {
+func (m *TreeModel) Insert(title, uuid, content string) (int, error) {
 	// Write the SQL statement we want to execute. I've split it over two lines
 	// for readability (which is why it's surrounded with backquotes instead
 	// of normal double quotes).
@@ -28,7 +28,7 @@ func (m *TreeModel) Insert(title, content, expires string) (int, error) {
 	// title, content and expiry values for the placeholder parameters. This
 	// method returns a sql.Result object, which contains some basic
 	// information about what happened when the statement was executed.
-	result, err := m.DB.Exec(stmt, title, content, expires)
+	result, err := m.DB.Exec(stmt, uuid, title, content)
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +65,7 @@ func (m *TreeModel) Get(id int) (*models.Tree, error) {
 	// to row.Scan are *pointers* to the place you want to copy the data into,
 	// and the number of arguments must be exactly the same as the number of
 	// columns returned by your statement.
-	err := row.Scan(&s.ID, &s.Uuid, &s.Title,  &s.Content, &s.Created)
+	err := row.Scan(&s.ID, &s.Uuid, &s.Title, &s.Content, &s.Created)
 	if err != nil {
 		// If the query returns no rows, then row.Scan() will return a
 		// sql.ErrNoRows error. We use the errors.Is() function check for that

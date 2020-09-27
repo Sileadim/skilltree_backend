@@ -5,7 +5,7 @@ import (
 	"errors"  // New import
 	"strings" // New import
 
-	"github.com/Sileadim/snippetbox/pkg/models"
+	"github.com/Sileadim/skilltree_backend/pkg/models"
 
 	"github.com/go-sql-driver/mysql" // New import
 	"golang.org/x/crypto/bcrypt"     // New import

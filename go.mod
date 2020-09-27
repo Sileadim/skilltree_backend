@@ -9,5 +9,5 @@ require (
 	github.com/golangcollege/sessions v1.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/justinas/nosurf v1.1.1
-	golang.org/x/crypto v0.0.0-20200317142112-1b76d66859c6
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 )
