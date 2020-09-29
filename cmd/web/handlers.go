@@ -13,15 +13,26 @@ import (
 
 func (app *application) getTrees(w http.ResponseWriter, r *http.Request) {
 
-	//trees, err := app.trees.List()
-
-	m := map[string]interface{}{}
-	fmt.Println(m)
-	//for t, i := range(trees){
-	//
-	//
-	//
-	//}
+	trees, err := app.trees.List()
+	fmt.Println(trees)
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+	var m []map[string]interface{}
+	for _, t := range trees {
+		mapRepr, err := t.ToMap()
+		if err != nil {
+			app.serverError(w, err)
+		}
+		m = append(m, mapRepr)
+	}
+	byteRepresentation, err := json.Marshal(m)
+	if err != nil {
+		app.serverError(w, err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(byteRepresentation)
 
 }
 
@@ -34,7 +45,6 @@ func (app *application) getTree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	t, err := app.trees.Get(id)
-	fmt.Println(t)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
@@ -44,8 +54,6 @@ func (app *application) getTree(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	byteRepresentation, err := t.ToJSON()
-	print("byteRepresentation")
-	fmt.Println(byteRepresentation)
 	if err != nil {
 		app.serverError(w, err)
 	}
