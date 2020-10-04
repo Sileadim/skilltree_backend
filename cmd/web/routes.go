@@ -11,7 +11,7 @@ func (app *application) routes() http.Handler {
 	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	dynamicMiddleware := alice.New(app.session.Enable, app.authenticate)
 	mux := pat.New()
-	mux.Post("/tree/create", http.HandlerFunc(app.createTree))
+	mux.Post("/tree/create", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.createTree))
 	mux.Get("/tree/:id", dynamicMiddleware.ThenFunc(app.getTree))
 	mux.Get("/list", dynamicMiddleware.ThenFunc(app.getTrees))
 	mux.Post("/user/signup", dynamicMiddleware.ThenFunc(app.signupUser))
