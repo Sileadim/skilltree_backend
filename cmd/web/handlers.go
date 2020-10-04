@@ -113,36 +113,33 @@ func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Signed up user %v", t["name"].(string))
 }
 
-//
-//
-//func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
-//    err := r.ParseForm()
-//    if err != nil {
-//        app.clientError(w, http.StatusBadRequest)
-//        return
-//    }
-//
-//    // Check whether the credentials are valid. If they're not, add a generic error
-//    // message to the form failures map and re-display the login page.
-//    form := forms.New(r.PostForm)
-//    id, err := app.users.Authenticate(form.Get("email"), form.Get("password"))
-//    if err != nil {
-//        if errors.Is(err, models.ErrInvalidCredentials) {
-//            form.Errors.Add("generic", "Email or Password is incorrect")
-//            app.render(w, r, "login.page.tmpl", &templateData{Form: form})
-//        } else {
-//            app.serverError(w, err)
-//        }
-//        return
-//    }
-//
-//    // Add the ID of the current user to the session, so that they are now 'logged
-//    // in'.
-//    app.session.Put(r, "authenticatedUserID", id)
-//
-//    // Redirect the user to the create snippet page.
-//    http.Redirect(w, r, "/snippet/create", http.StatusSeeOther)
-//}
+func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
+	t := map[string]interface{}{}
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("Decoding error")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	id, err := app.users.Authenticate(t["email"].(string), t["password"].(string))
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			app.incorrectCrendentialsError(w, err)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	// Add the ID of the current user to the session, so that they are now 'logged
+	// in'.
+	app.session.Put(r, "authenticatedUserID", id)
+
+	// Redirect the user to the create snippet page.
+	fmt.Fprintf(w, "Logged in user %v", t["name"].(string))
+}
+
 //
 //func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 //    // Remove the authenticatedUserID from the session data so that the user is

@@ -35,6 +35,10 @@ func (app *application) duplicateEmailError(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), 409)
 }
 
+func (app *application) incorrectCrendentialsError(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), 400)
+}
+
 // The clientError helper sends a specific status code and corresponding description
 // to the user. We'll use this later in the book to send responses like 400 "Bad
 // Request" when there's a problem with the request that the user sent.
