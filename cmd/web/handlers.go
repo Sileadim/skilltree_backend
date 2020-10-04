@@ -67,22 +67,17 @@ func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
 
 	t := map[string]interface{}{}
 	fmt.Println(r)
-	// Try to decode the request body into the struct. If there is an error,
-	// respond to the client with the error message and a 400 status code.
 	err := json.NewDecoder(r.Body).Decode(&t)
-
 	fmt.Println(t)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	content, err := json.Marshal(t["content"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	id, err := app.trees.Insert(t["title"].(string), t["uuid"].(string), string(content))
 	if err != nil {
 		app.serverError(w, err)
@@ -93,45 +88,31 @@ func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
-//    err := r.ParseForm()
-//    if err != nil {
-//        app.clientError(w, http.StatusBadRequest)
-//        return
-//    }
-//
-//    form := forms.New(r.PostForm)
-//    form.Required("name", "email", "password")
-//    form.MaxLength("name", 255)
-//	form.MaxLength("email", 255)
-//    form.MatchesPattern("email", forms.EmailRX)
-//    form.MinLength("password", 10)
-//
-//    //if !form.Valid() {
-//    //    app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
-//    //    return
-//    //}
-//
-//    // Try to create a new user record in the database. If the email already exists
-//    // add an error message to the form and re-display it.
-//    err = app.users.Insert(form.Get("name"), form.Get("email"), form.Get("password"))
-//    if err != nil {
-//        if errors.Is(err, models.ErrDuplicateEmail) {
-//            form.Errors.Add("email", "Address is already in use")
-//            app.render(w, r, "signup.page.tmpl", &templateData{Form: form})
-//        } else {
-//            app.serverError(w, err)
-//        }
-//        return
-//    }
-//
-//    // Otherwise add a confirmation flash message to the session confirming that
-//    // their signup worked and asking them to log in.
-//    app.session.Put(r, "flash", "Your signup was successful. Please log in.")
-//
-//    // And redirect the user to the login page.
-//    http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-//}
+func (app *application) signupUser(w http.ResponseWriter, r *http.Request) {
+
+	t := map[string]interface{}{}
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("Decoding error")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = app.users.Insert(t["name"].(string), t["email"].(string), t["password"].(string))
+	if err != nil {
+		fmt.Println(err.Error())
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			app.duplicateEmailError(w, err)
+
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	app.session.Put(r, "flash", "Your signup was successful. Please log in.")
+	fmt.Fprintf(w, "Signed up user %v", t["name"].(string))
+}
+
 //
 //
 //func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
@@ -173,5 +154,6 @@ func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
 //    http.Redirect(w, r, "/", http.StatusSeeOther)
 //}
 func ping(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Ping!")
 	w.Write([]byte("OK"))
 }

@@ -82,6 +82,7 @@ func noSurf(next http.Handler) http.Handler {
 
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Checking authentication..")
 		// Check if a authenticatedUserID value exists in the session. If this *isn't
 		// present* then call the next handler in the chain as normal.
 		exists := app.session.Exists(r, "authenticatedUserID")
