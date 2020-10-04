@@ -16,13 +16,7 @@ func (app *application) routes() http.Handler {
 	mux.Get("/list", dynamicMiddleware.ThenFunc(app.getTrees))
 	mux.Post("/user/signup", dynamicMiddleware.ThenFunc(app.signupUser))
 	mux.Post("/user/login", dynamicMiddleware.ThenFunc(app.loginUser))
-	//mux.Post("/user/logout", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.logoutUser))
-
-	// Add a new GET /ping route.
+	mux.Post("/user/logout", dynamicMiddleware.Append(app.requireAuthentication).ThenFunc(app.logoutUser))
 	mux.Get("/ping", dynamicMiddleware.ThenFunc(ping))
-
-	//fileServer := http.FileServer(http.Dir("./ui/static/"))
-	//mux.Get("/static/", http.StripPrefix("/static", fileServer))
-
 	return standardMiddleware.Then(mux)
 }

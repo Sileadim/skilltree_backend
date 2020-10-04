@@ -131,25 +131,15 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
-	// Add the ID of the current user to the session, so that they are now 'logged
-	// in'.
 	app.session.Put(r, "authenticatedUserID", id)
-
-	// Redirect the user to the create snippet page.
 	fmt.Fprintf(w, "Logged in user %v", t["name"].(string))
 }
 
-//
-//func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
-//    // Remove the authenticatedUserID from the session data so that the user is
-//    // 'logged out'.
-//    app.session.Remove(r, "authenticatedUserID")
-//    // Add a flash message to the session to confirm to the user that they've been
-//    // logged out.
-//    app.session.Put(r, "flash", "You've been logged out successfully!")
-//    http.Redirect(w, r, "/", http.StatusSeeOther)
-//}
+func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
+	app.session.Remove(r, "authenticatedUserID")
+	app.session.Put(r, "flash", "You've been logged out successfully!")
+	fmt.Fprintf(w, "Logged out")
+}
 func ping(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Ping!")
 	w.Write([]byte("OK"))
