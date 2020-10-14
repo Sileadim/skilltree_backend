@@ -80,7 +80,7 @@ func (m *TreeModel) Get(id int) (*models.Tree, error) {
 // This will return the 10 most recently created snippets.
 func (m *TreeModel) List() ([]*models.Tree, error) {
 	// todo: make this
-	stmt := `SELECT id, uuid, title, content, created FROM trees
+	stmt := `SELECT id, title, uuid, content, created FROM trees
     ORDER BY created DESC LIMIT 100`
 	rows, err := m.DB.Query(stmt)
 	if err != nil {

@@ -31,6 +31,7 @@ func (app *application) getTrees(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serverError(w, err)
 	}
+	print(m)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(byteRepresentation)
 
@@ -78,7 +79,8 @@ func (app *application) createTree(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	id, err := app.trees.Insert(t["title"].(string), t["uuid"].(string), string(content))
+	fmt.Println(t)
+	id, err := app.trees.Insert(t["name"].(string), t["uuid"].(string), string(content))
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -122,7 +124,8 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	id, err := app.users.Authenticate(t["email"].(string), t["password"].(string))
+	fmt.Println(t)
+	id, name, err := app.users.Authenticate(t["email"].(string), t["password"].(string))
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			app.incorrectCrendentialsError(w, err)
@@ -131,8 +134,22 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	data := map[string]interface{}{"name": name, "id": id}
+
+	byteRepresentation, err := json.Marshal(data)
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	fmt.Println(id)
 	app.session.Put(r, "authenticatedUserID", id)
-	fmt.Fprintf(w, "Logged in user %v", t["name"].(string))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(byteRepresentation)
+
+	//fmt.Fprintf(w, "Logged in user %v", t["name"].(string))
+	//w.Write([]byte("OK"))
+
 }
 
 func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {

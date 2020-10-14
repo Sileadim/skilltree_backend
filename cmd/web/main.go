@@ -25,7 +25,7 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 	session  *sessions.Session
-	trees interface {
+	trees    interface {
 		Insert(string, string, string) (int, error)
 		Get(int) (*models.Tree, error)
 		List() ([]*models.Tree, error)
@@ -33,7 +33,7 @@ type application struct {
 	templateCache map[string]*template.Template
 	users         interface {
 		Insert(string, string, string) error
-		Authenticate(string, string) (int, error)
+		Authenticate(string, string) (int, string, error)
 		Get(int) (*models.User, error)
 	}
 }
@@ -68,7 +68,7 @@ func main() {
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		session:       session,
-		trees:      &mysql.TreeModel{DB: db},
+		trees:         &mysql.TreeModel{DB: db},
 		templateCache: templateCache,
 		users:         &mysql.UserModel{DB: db},
 	}

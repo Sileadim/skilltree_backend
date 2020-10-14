@@ -4,9 +4,7 @@ import (
 	"database/sql"
 	"errors"  // New import
 	"strings" // New import
-
 	"github.com/Sileadim/skilltree_backend/pkg/models"
-
 	"github.com/go-sql-driver/mysql" // New import
 	"golang.org/x/crypto/bcrypt"     // New import
 )
@@ -46,20 +44,21 @@ func (m *UserModel) Insert(name, email, password string) error {
 
 	return nil
 }
-func (m *UserModel) Authenticate(email, password string) (int, error) {
+func (m *UserModel) Authenticate(email, password string) (int,string, error) {
 	// Retrieve the id and hashed password associated with the given email. If no
 	// matching email exists, or the user is not active, we return the
 	// ErrInvalidCredentials error.
 	var id int
+	var name string
 	var hashedPassword []byte
-	stmt := "SELECT id, hashed_password FROM users WHERE email = ? AND active = TRUE"
+	stmt := "SELECT id, name, hashed_password FROM users WHERE email = ? AND active = TRUE"
 	row := m.DB.QueryRow(stmt, email)
-	err := row.Scan(&id, &hashedPassword)
+	err := row.Scan(&id, &name, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, models.ErrInvalidCredentials
+			return 0, "", models.ErrInvalidCredentials
 		} else {
-			return 0, err
+			return 0, "", err
 		}
 	}
 
@@ -68,14 +67,14 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return 0, models.ErrInvalidCredentials
+			return 0, "", models.ErrInvalidCredentials
 		} else {
-			return 0, err
+			return 0,"", err
 		}
 	}
 
 	// Otherwise, the password is correct. Return the user ID.
-	return id, nil
+	return id, name, nil
 }
 
 // Get load a user by id, returns a user and error
